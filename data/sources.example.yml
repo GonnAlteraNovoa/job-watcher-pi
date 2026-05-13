@@ -1,0 +1,58 @@
+filters:
+  keywords:
+    - junior
+    - ICT Support
+    - IT Support
+    - Field Support
+    - Hardware Technician
+    - Application Support
+    - Service Desk
+    - Quereinsteiger
+    - Berufseinsteiger
+    - Trainee
+    - Supporter
+    - Informatiker
+  negative_keywords:
+    - senior
+    - manager
+    - lead
+    - principal
+    - director
+  preferred_locations:
+    - Bern
+    - Zürich
+    - Zurich
+    - Remote Switzerland
+    - Schweiz remote
+    - Homeoffice Schweiz
+    - Fribourg
+    - Freiburg
+    - Solothurn
+    - Biel
+    - Thun
+  minimum_score: 5
+
+sources:
+  - name: Swiss Job Board Placeholder
+    type: generic_html
+    enabled: false
+    url: https://example.com/jobs?q=it+support+bern
+    selectors:
+      job_card: ".job-card"
+      title: ".job-title"
+      company: ".company"
+      location: ".location"
+      link: "a.job-link"
+      description: ".job-description"
+
+  - name: Company Careers Placeholder
+    type: generic_html
+    enabled: false
+    url: https://example.com/careers
+    selectors:
+      job_card: "li.opening"
+      title: ".opening-title"
+      company: ".opening-company"
+      location: ".opening-location"
+      link: "a"
+      description: ".opening-summary"
