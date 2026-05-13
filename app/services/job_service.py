@@ -5,6 +5,7 @@ from pydantic import HttpUrl
 
 from app.database import JobRepository
 from app.job_sources.generic_html import GenericHtmlSource
+from app.job_sources.rss import RssSource
 from app.schemas import AppConfigFile, JobCreate, RawJobListing, ScanResponse, SourceConfig
 from app.services.deduplicator import canonicalize_url, content_hash
 from app.services.fetcher import HttpFetcher
@@ -65,10 +66,12 @@ class JobService:
             errors=errors,
         )
 
-    def _build_source(self, source_config: SourceConfig) -> GenericHtmlSource:
-        if source_config.type != "generic_html":
-            raise ValueError(f"Unsupported source type: {source_config.type}")
-        return GenericHtmlSource(source_config, self.fetcher)
+    def _build_source(self, source_config: SourceConfig) -> GenericHtmlSource | RssSource:
+        if source_config.type == "generic_html":
+            return GenericHtmlSource(source_config, self.fetcher)
+        if source_config.type == "rss":
+            return RssSource(source_config, self.fetcher)
+        raise ValueError(f"Unsupported source type: {source_config.type}")
 
 
 def _normalize_job_url(job: RawJobListing) -> RawJobListing:

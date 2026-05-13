@@ -7,7 +7,7 @@ from app.models import JobStatus
 
 
 class SourceSelectors(BaseModel):
-    job_card: str
+    job_card: str = ""
     title: str = ""
     company: str | None = None
     location: str | None = None
@@ -20,7 +20,7 @@ class SourceConfig(BaseModel):
     type: str = "generic_html"
     enabled: bool = True
     url: HttpUrl
-    selectors: SourceSelectors
+    selectors: SourceSelectors = Field(default_factory=SourceSelectors)
 
 
 class FilterConfig(BaseModel):

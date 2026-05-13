@@ -56,3 +56,8 @@ sources:
       location: ".opening-location"
       link: "a"
       description: ".opening-summary"
+
+  - name: SwissDevJobs RSS
+    type: rss
+    enabled: false
+    url: https://swissdevjobs.ch/rss
