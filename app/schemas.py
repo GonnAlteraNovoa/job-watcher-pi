@@ -8,10 +8,10 @@ from app.models import JobStatus
 
 class SourceSelectors(BaseModel):
     job_card: str
-    title: str
+    title: str = ""
     company: str | None = None
     location: str | None = None
-    link: str
+    link: str = ""
     description: str | None = None
 
 
