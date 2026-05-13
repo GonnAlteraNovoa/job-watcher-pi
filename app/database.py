@@ -129,7 +129,7 @@ class JobRepository:
 
         if clauses:
             query += " WHERE " + " AND ".join(clauses)
-        query += " ORDER BY date_found DESC, score DESC"
+        query += " ORDER BY score DESC, date_found DESC"
 
         with connection_context(self.database_path) as connection:
             rows = connection.execute(query, params).fetchall()
