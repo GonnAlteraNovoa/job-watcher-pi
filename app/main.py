@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.dashboard import router as dashboard_router
 from app.api.routes import router
 from app.config import configure_logging, get_settings
 from app.database import init_db
@@ -23,3 +24,4 @@ app = FastAPI(
 )
 
 app.include_router(router)
+app.include_router(dashboard_router)
