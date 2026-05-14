@@ -58,9 +58,32 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
       --muted: #667085;
       --accent: #2563eb;
       --accent-soft: #dbeafe;
+      --accent-text: #1d4ed8;
+      --control-bg: #ffffff;
+      --button-bg: #17202a;
+      --button-text: #ffffff;
+      --description: #344054;
       --good: #047857;
       --warn: #b45309;
       --bad: #b91c1c;
+    }}
+    :root[data-theme="dark"] {{
+      color-scheme: dark;
+      --bg: #101418;
+      --panel: #181d23;
+      --border: #303946;
+      --text: #eef2f6;
+      --muted: #a0acba;
+      --accent: #60a5fa;
+      --accent-soft: #1e3a5f;
+      --accent-text: #bfdbfe;
+      --control-bg: #111820;
+      --button-bg: #eef2f6;
+      --button-text: #111820;
+      --description: #cbd5e1;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #f87171;
     }}
     * {{ box-sizing: border-box; }}
     body {{
@@ -86,6 +109,10 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
       gap: 16px;
       padding: 18px 0;
     }}
+    .title-block {{
+      display: grid;
+      gap: 2px;
+    }}
     h1 {{
       margin: 0;
       font-size: 1.35rem;
@@ -94,6 +121,21 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
     .count {{
       color: var(--muted);
       font-size: 0.95rem;
+      white-space: nowrap;
+    }}
+    .header-actions {{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }}
+    .theme-toggle {{
+      width: auto;
+      min-height: 38px;
+      border-radius: 999px;
+      padding: 0 14px;
+      background: var(--control-bg);
+      color: var(--text);
+      border-color: var(--border);
       white-space: nowrap;
     }}
     form.filters {{
@@ -108,15 +150,15 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 0 12px;
-      background: #fff;
+      background: var(--control-bg);
       color: var(--text);
       font: inherit;
     }}
     button {{
       cursor: pointer;
-      background: var(--text);
-      color: #fff;
-      border-color: var(--text);
+      background: var(--button-bg);
+      color: var(--button-text);
+      border-color: var(--button-bg);
       font-weight: 650;
     }}
     main {{
@@ -162,7 +204,7 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
       border-radius: 999px;
       padding: 2px 9px;
       background: var(--accent-soft);
-      color: #1d4ed8;
+      color: var(--accent-text);
       font-size: 0.82rem;
       font-weight: 700;
       white-space: nowrap;
@@ -182,7 +224,7 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      color: #344054;
+      color: var(--description);
       margin-top: 10px;
       font-size: 0.95rem;
     }}
@@ -220,9 +262,12 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
         width: min(100% - 20px, 1120px);
       }}
       .topbar {{
-        align-items: flex-start;
+        align-items: stretch;
         flex-direction: column;
-        gap: 4px;
+        gap: 10px;
+      }}
+      .header-actions {{
+        justify-content: space-between;
       }}
       form.filters {{
         grid-template-columns: 1fr;
@@ -242,8 +287,13 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
   <header>
     <div class="wrap">
       <div class="topbar">
-        <h1>Job Watcher Pi</h1>
-        <div class="count">{len(jobs)} jobs shown</div>
+        <div class="title-block">
+          <h1>Job Watcher Pi</h1>
+          <div class="count">{len(jobs)} jobs shown</div>
+        </div>
+        <div class="header-actions">
+          <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle dark mode">Dark mode</button>
+        </div>
       </div>
       <form class="filters" method="get" action="/dashboard">
         <input name="keyword" value="{escape(keyword or "")}" placeholder="Filter by keyword">
@@ -262,6 +312,31 @@ def _render_dashboard(jobs: list[JobRead], status: JobStatus | None, keyword: st
     {empty_state}
   </main>
   <script>
+    const root = document.documentElement;
+    const themeToggle = document.getElementById("theme-toggle");
+
+    function preferredTheme() {{
+      const savedTheme = localStorage.getItem("job-watcher-theme");
+      if (savedTheme === "light" || savedTheme === "dark") {{
+        return savedTheme;
+      }}
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }}
+
+    function applyTheme(theme) {{
+      root.dataset.theme = theme;
+      themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+      themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    }}
+
+    applyTheme(preferredTheme());
+
+    themeToggle.addEventListener("click", () => {{
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("job-watcher-theme", nextTheme);
+      applyTheme(nextTheme);
+    }});
+
     async function updateStatus(select) {{
       const jobId = select.dataset.jobId;
       select.disabled = true;

@@ -32,4 +32,6 @@ def test_dashboard_renders_jobs_and_status_controls() -> None:
     assert "Junior IT Support" in html
     assert "Example AG" in html
     assert 'data-job-id="1"' in html
+    assert 'id="theme-toggle"' in html
+    assert 'localStorage.getItem("job-watcher-theme")' in html
     assert "/jobs/${jobId}/status" in html
