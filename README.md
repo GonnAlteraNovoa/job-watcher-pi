@@ -140,6 +140,43 @@ New job match: {{title}} at {{company}} - {{location}} - Score: {{score}} - {{ur
 
 The `/scan` response contains `new_jobs`, so n8n can branch cleanly without tracking state itself.
 
+### Telegram Inline Buttons
+
+For Telegram notifications, include inline buttons with callback data that contains the job ID and target status. A practical format is:
+
+```text
+job_status:{{id}}:interesting
+job_status:{{id}}:ignored
+job_status:{{id}}:applied
+```
+
+Suggested buttons:
+
+```text
+Interesting
+Ignore
+Applied
+```
+
+In n8n, handle Telegram callback queries with a second workflow:
+
+1. **Telegram Trigger** receives callback queries.
+2. Parse the callback data, for example `job_status:12:interesting`.
+3. **HTTP Request** node:
+   - Method: `POST`
+   - URL: `http://<pi-ip>:8088/jobs/12/status/interesting`
+4. **Telegram** node sends a short confirmation.
+
+The backend also supports the normal JSON API:
+
+```bash
+curl -X PATCH http://localhost:8088/jobs/12/status \
+  -H "Content-Type: application/json" \
+  -d '{"status":"interesting"}'
+```
+
+The URL-based `POST` endpoint exists to keep Telegram/n8n callback workflows simple.
+
 ## Development
 
 Install dependencies:

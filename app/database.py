@@ -83,6 +83,11 @@ class JobRepository:
             ).fetchone()
             return row is not None
 
+    def get(self, job_id: int) -> JobRead | None:
+        with connection_context(self.database_path) as connection:
+            row = connection.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
+            return row_to_job(row) if row else None
+
     def add(self, job: JobCreate) -> JobRead:
         now = datetime.now(UTC).isoformat()
         with connection_context(self.database_path) as connection:

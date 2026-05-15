@@ -42,13 +42,37 @@ def list_jobs(
     return repository.list(status=status, keyword=keyword)
 
 
+@router.get("/jobs/{job_id}", response_model=JobRead)
+def get_job(
+    job_id: int,
+    repository: JobRepository = Depends(get_repository),
+) -> JobRead:
+    job = repository.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
+
+
 @router.patch("/jobs/{job_id}/status", response_model=JobRead)
 def update_job_status(
     job_id: int,
     update: StatusUpdate,
     repository: JobRepository = Depends(get_repository),
 ) -> JobRead:
-    job = repository.update_status(job_id, update.status)
+    return _update_status_or_404(repository, job_id, update.status)
+
+
+@router.post("/jobs/{job_id}/status/{status}", response_model=JobRead)
+def update_job_status_action(
+    job_id: int,
+    status: JobStatus,
+    repository: JobRepository = Depends(get_repository),
+) -> JobRead:
+    return _update_status_or_404(repository, job_id, status)
+
+
+def _update_status_or_404(repository: JobRepository, job_id: int, status: JobStatus) -> JobRead:
+    job = repository.update_status(job_id, status)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
